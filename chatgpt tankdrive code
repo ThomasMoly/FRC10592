@@ -1,0 +1,28 @@
+package frc.robot;
+
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
+public class Robot extends TimedRobot {
+    // Define PWM motor controllers
+    private PWMVictorSPX leftMotor = new PWMVictorSPX(0); // Left motor on PWM port 0
+    private PWMVictorSPX rightMotor = new PWMVictorSPX(1); // Right motor on PWM port 1
+
+    // Define differential drive system
+    private DifferentialDrive drive = new DifferentialDrive(leftMotor, rightMotor);
+
+    // Define joystick for control
+    private Joystick joystick = new Joystick(0); // Joystick on USB port 0
+
+    @Override
+    public void teleopPeriodic() {
+        // Get joystick Y-axis values for tank drive control
+        double leftSpeed = -joystick.getRawAxis(1);  // Left stick Y-axis
+        double rightSpeed = -joystick.getRawAxis(5); // Right stick Y-axis
+
+        // Drive the robot using tank drive
+        drive.tankDrive(leftSpeed, rightSpeed);
+    }
+}
