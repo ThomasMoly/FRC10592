@@ -1,0 +1,102 @@
+package frc.robot;
+
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+public class Robot extends TimedRobot {
+
+    // Constants for speeds and durations
+    private static final double AUTO_SPEED = 0.6;
+    private static final double TELEOP_SPEED_SCALING = 0.6;
+    private static final double TURN_SCALING = 0.3;
+    private static final double AUTO_DURATION = 3.0;
+
+    // Instantiate the four CAN-connected Spark Max motor controllers.
+    // Change the MotorType if you are using brushed motors.
+    private CANSparkMax leftMotor1 = new CANSparkMax(1, MotorType.kBrushless);
+    private CANSparkMax leftMotor2 = new CANSparkMax(2, MotorType.kBrushless);
+    private CANSparkMax rightMotor1 = new CANSparkMax(3, MotorType.kBrushless);
+    private CANSparkMax rightMotor2 = new CANSparkMax(4, MotorType.kBrushless);
+
+    // Group the left side motors and the right side motors
+    private SpeedControllerGroup leftMotors = new SpeedControllerGroup(leftMotor1, leftMotor2);
+    private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rightMotor1, rightMotor2);
+
+    // Create the DifferentialDrive object to handle arcade drive control
+    private DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
+
+    // Joystick for teleop control (plugged into Driver Station port 0)
+    private Joystick joy1 = new Joystick(0);
+    
+    // Variable to track the start time in autonomous mode
+    private double startTime;
+
+    @Override
+    public void robotInit() {
+        // For many drivetrains, the right side motors need to be inverted.
+        // This call ensures that a positive speed makes the robot move forward.
+        drive.setRightSideInverted(true);
+    }
+
+    @Override
+    public void autonomousInit() {
+        // Record the time at which autonomous mode begins.
+        startTime = Timer.getFPGATimestamp();
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+        double time = Timer.getFPGATimestamp();
+        System.out.println("Autonomous Time: " + (time - startTime));
+
+        // For the first AUTO_DURATION seconds, drive forward.
+        if (time - startTime < AUTO_DURATION) {
+            // Arcade drive: (speed, turn). Here, no turning (0 turn).
+            drive.arcadeDrive(AUTO_SPEED, 0.0);
+        } else {
+            // Stop the robot after the autonomous period.
+            drive.arcadeDrive(0.0, 0.0);
+        }
+    }
+
+    @Override
+    public void teleopInit() {
+        // Any teleop initialization code goes here.
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        // Read the joystick axes. The negative on axis 1 may be necessary
+        // because joysticks often return a negative value when pushed forward.
+        double speed = applyDeadband(-joy1.getRawAxis(1), 0.05) * TELEOP_SPEED_SCALING;
+        double turn = applyDeadband(joy1.getRawAxis(4), 0.05) * TURN_SCALING;
+
+        // Use arcade drive for teleoperated control.
+        drive.arcadeDrive(speed, turn);
+
+        System.out.println("Joystick Speed: " + speed + " Turn: " + turn);
+    }
+
+    @Override
+    public void testInit() {
+    }
+
+    @Override
+    public void testPeriodic() {
+    }
+
+    /**
+     * Applies a deadband to joystick input to ignore small values.
+     * @param value The input value from the joystick.
+     * @param threshold The minimum magnitude to register.
+     * @return The adjusted value (or 0 if within the deadband).
+     */
+    private double applyDeadband(double value, double threshold) {
+        return (Math.abs(value) > threshold) ? value : 0.0;
+    }
+}
