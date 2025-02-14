@@ -5,8 +5,14 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+// Updated REVLib 2025 import paths and classes:
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMaxConfig;
+import com.revrobotics.spark.ResetMode;
+import com.revrobotics.spark.PersistMode;
+import com.revrobotics.spark.IdleMode;
 
 public class Robot extends TimedRobot {
 
@@ -16,30 +22,44 @@ public class Robot extends TimedRobot {
     private static final double TURN_SCALING = 0.3;
     private static final double AUTO_DURATION = 3.0;
 
-    // Instantiate the four CAN-connected Spark Max motor controllers.
-    // Change the MotorType if you are using brushed motors.
-    private CANSparkMax leftMotor1 = new CANSparkMax(1, MotorType.kBrushless);
-    private CANSparkMax leftMotor2 = new CANSparkMax(2, MotorType.kBrushless);
-    private CANSparkMax rightMotor1 = new CANSparkMax(3, MotorType.kBrushless);
-    private CANSparkMax rightMotor2 = new CANSparkMax(4, MotorType.kBrushless);
+    // Create a configuration object for our SparkMax motors.
+    // Here we set the idle mode to brake. Additional configuration (e.g., inversion,
+    // encoder conversion factors, PID parameters) can be added as needed.
+    private final SparkMaxConfig sparkConfig = new SparkMaxConfig()
+            .idleMode(IdleMode.kBrake);
 
-    // Group the left side motors and the right side motors
+    // Instantiate the four SparkMax motor controllers using REVLib 2025.
+    // Use brushed motors (MotorType.kBrushed) and apply the desired CAN IDs.
+    // Mapping:
+    // - Right Motors: IDs 1 (posterior) and 2 (anterior)
+    // - Left Motors: IDs 3 (posterior) and 4 (anterior)
+    private SparkMax rightMotor1 = new SparkMax(1, MotorType.kBrushed);
+    private SparkMax rightMotor2 = new SparkMax(2, MotorType.kBrushed);
+    private SparkMax leftMotor1  = new SparkMax(3, MotorType.kBrushed);
+    private SparkMax leftMotor2  = new SparkMax(4, MotorType.kBrushed);
+
+    // Group the left side and right side motors.
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(leftMotor1, leftMotor2);
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rightMotor1, rightMotor2);
 
-    // Create the DifferentialDrive object to handle arcade drive control
+    // Create the DifferentialDrive object for arcade drive control.
     private DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
 
-    // Joystick for teleop control (plugged into Driver Station port 0)
+    // Joystick for teleop control (connected to Driver Station port 0)
     private Joystick joy1 = new Joystick(0);
     
-    // Variable to track the start time in autonomous mode
+    // Variable to track the start time in autonomous mode.
     private double startTime;
 
     @Override
     public void robotInit() {
-        // For many drivetrains, the right side motors need to be inverted.
-        // This call ensures that a positive speed makes the robot move forward.
+        // Configure each SparkMax using the new REVLib 2025 configuration system.
+        rightMotor1.configure(sparkConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightMotor2.configure(sparkConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftMotor1.configure(sparkConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftMotor2.configure(sparkConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // Invert the right side of the drivetrain so a positive speed moves the robot forward.
         drive.setRightSideInverted(true);
     }
 
@@ -54,12 +74,10 @@ public class Robot extends TimedRobot {
         double time = Timer.getFPGATimestamp();
         System.out.println("Autonomous Time: " + (time - startTime));
 
-        // For the first AUTO_DURATION seconds, drive forward.
+        // Drive forward for AUTO_DURATION seconds.
         if (time - startTime < AUTO_DURATION) {
-            // Arcade drive: (speed, turn). Here, no turning (0 turn).
             drive.arcadeDrive(AUTO_SPEED, 0.0);
         } else {
-            // Stop the robot after the autonomous period.
             drive.arcadeDrive(0.0, 0.0);
         }
     }
@@ -71,14 +89,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // Read the joystick axes. The negative on axis 1 may be necessary
-        // because joysticks often return a negative value when pushed forward.
+        // Read joystick axes (apply a deadband for small inputs).
         double speed = applyDeadband(-joy1.getRawAxis(1), 0.05) * TELEOP_SPEED_SCALING;
         double turn = applyDeadband(joy1.getRawAxis(4), 0.05) * TURN_SCALING;
 
-        // Use arcade drive for teleoperated control.
+        // Arcade drive control.
         drive.arcadeDrive(speed, turn);
-
         System.out.println("Joystick Speed: " + speed + " Turn: " + turn);
     }
 
