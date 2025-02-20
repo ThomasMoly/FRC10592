@@ -8,5 +8,5 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class P_Delivery extends TimedRobot {
     //Kit-Bot Delivery System for the pipes
-  public static final PWMSparkMax P_delivery = Constants.P_Delivery;
+  public static final PWMSparkMax P_delivery = Constants.P_motorDelivery ;
 }
