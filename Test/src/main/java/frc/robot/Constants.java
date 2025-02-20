@@ -13,6 +13,7 @@ public class Constants extends TimedRobot {
     public static final PWMSparkMax m_leftDrive2 = new PWMSparkMax(1); // front left
     public static final PWMSparkMax m_rightDrive1 = new PWMSparkMax(2); // front right
     public static final PWMSparkMax m_rightDrive2 = new PWMSparkMax(3); // back right
+    public static final PWMSparkMax P_motorDelivery = new PWMSparkMax(4); // Motor for the pipe delivery system
     
     public static final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftDrive2::set, m_rightDrive1::set);
     public static final XboxController m_controller = new XboxController(0);
