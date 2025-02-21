@@ -17,7 +17,7 @@ public class P_Delivery extends TimedRobot {
     }
 
     @Override
-    public void Teleop{
+    public void Teleop(){
         // Control the motor with the controller trigger
         double speed = controller.getRightTriggerAxis(); // Adjust based on control scheme
         P_delivery.set(speed); // Runs the motor with trigger input
