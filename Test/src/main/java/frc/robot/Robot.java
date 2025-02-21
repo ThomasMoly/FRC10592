@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
  * this project, you must also update the manifest file in the resource directory.
  */
 public class Robot extends TimedRobot {
-   private final PWMSparkMax m_leftDrive1 = Constants.m_leftDrive1; // back left
+    private final PWMSparkMax m_leftDrive1 = Constants.m_leftDrive1; // back left
     private final PWMSparkMax m_leftDrive2 = Constants.m_leftDrive2; // front left
     private final PWMSparkMax m_rightDrive1 = Constants.m_rightDrive1; // front right
     private final PWMSparkMax m_rightDrive2 = Constants.m_rightDrive2; // back right
@@ -28,10 +28,10 @@ public class Robot extends TimedRobot {
         m_leftDrive2.addFollower(m_leftDrive1);  // front left motor follows back left motor
         m_rightDrive1.addFollower(m_rightDrive2); // back right motor follows front right motor
     }
-
   private final DifferentialDrive m_robotDrive = Constants.m_robotDrive;
   private final XboxController m_controller = Constants.m_controller;
   private final Timer m_timer = Constants.m_timer;
+  private final P_Delivery delivery = new P_Delivery;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -53,10 +53,11 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    // Drive for 2 seconds
+    // Drive for 5 seconds
     if (m_timer.get() < 5.0) {
       // Drive forwards half speed, make sure to turn input squaring off
       m_robotDrive.arcadeDrive(0.25, 0.0, false);
+      delivery.Autonomous(); 
     } else {
       m_robotDrive.stopMotor(); // stop robot
     }
@@ -70,6 +71,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
+     delivery.Teleop();
   }
 
   /** This function is called once each time the robot enters test mode. */
