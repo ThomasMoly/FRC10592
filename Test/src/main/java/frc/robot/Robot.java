@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive = Constants.m_robotDrive;
   private final XboxController m_controller = Constants.m_controller;
   private final Timer m_timer = Constants.m_timer;
-  private final P_Delivery delivery = new P_Delivery;
+  private final P_Delivery delivery = new P_Delivery();
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
