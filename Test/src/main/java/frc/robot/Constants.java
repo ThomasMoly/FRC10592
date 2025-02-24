@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
-public class Constants extends TimedRobot {
+public class Constants{
 
     // Motor controllers for the left and right drive motors
     public static final PWMSparkMax m_leftDrive1 = new PWMSparkMax(0); // back left
