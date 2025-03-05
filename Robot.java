@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
+    m_robotDrive.arcadeDrive(-m_controller.getLeftY()/1.25, m_controller.getRightX()/1.25);
     delivery.teleopPeriodic();
   }
 
