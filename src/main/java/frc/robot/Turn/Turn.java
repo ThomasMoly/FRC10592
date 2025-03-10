@@ -13,18 +13,24 @@ public class Turn{
   public static DifferentialDrive m_robotDrive = Constants.m_robotDrive;
 
    public void start() {
-// reset the gryo
-        gryo.reset(); 
+// reset the gyro.reset(); 
     }
 
   public void turn(int angle) { //angle is always inputed as positive
     gyro.reset(); 
-    
-    while (gyro.getAngle() < angle) { 
+
+    if(angle < 0){
+    while (gyro.getAngle() < math.abs(angle)) { 
+      Constants.m_robotDrive.arcadeDrive(0.1, -1); //Adjust speed and turn rate as needed
+    }
+    else{
+      while (gyro.getAngle() < math.abs(angle)) { 
       Constants.m_robotDrive.arcadeDrive(0.1, 1); //Adjust speed and turn rate as needed
+    }
     }
     //stop once angle is reached
     constants.m_robotDrive.stopMotor(); 
   }
-
+  }
+  
 }
